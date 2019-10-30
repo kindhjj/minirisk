@@ -27,7 +27,7 @@ private:
 
 public:
     // Default constructor
-    Date() : m_y(1970), m_m(1), m_d(1), m_is_leap(false) {}
+    Date() : m_y(1970), m_m(1), m_d(1), m_is_leap(false), m_serial(this->serial()) {}
 
     // Constructor where the input value is checked.
     Date(unsigned year, unsigned month, unsigned day)
@@ -42,23 +42,27 @@ public:
         m_m = (unsigned char) month;
         m_d = (unsigned char) day;
         m_is_leap = is_leap_year(year);
+        m_serial = (unsigned)this->serial();
     }
 
     static void check_valid(unsigned y, unsigned m, unsigned d);
 
     bool operator<(const Date& d) const
     {
-        return (m_y < d.m_y) || (m_y == d.m_y && (m_m < d.m_m || (m_m == d.m_m && m_d < d.m_d)));
+        // return (m_y < d.m_y) || (m_y == d.m_y && (m_m < d.m_m || (m_m == d.m_m && m_d < d.m_d)));
+        return (this->m_serial) < d.m_serial;
     }
 
     bool operator==(const Date& d) const
     {
-        return (m_y == d.m_y) && (m_m == d.m_m) && (m_d == d.m_d);
+        // return (m_y == d.m_y) && (m_m == d.m_m) && (m_d == d.m_d);
+        return (this->m_serial) == d.m_serial;
     }
 
     bool operator>(const Date& d) const
     {
-        return d < (*this);
+        // return d < (*this);
+        return (this->m_serial) > d.m_serial;
     }
 
     // number of days since 1-Jan-1900
@@ -82,6 +86,7 @@ private:
     unsigned char m_m;
     unsigned char m_d;
     bool m_is_leap;
+    unsigned m_serial;  //the corresponding serial date number
 };
 
 long operator-(const Date& d1, const Date& d2);
