@@ -7,4 +7,5 @@ portfolio.tmp
 *.txt
 *.exe
 *.stackdump
+*.dSYM
 

@@ -87,10 +87,10 @@ ptrade_t load_trade(my_ifstream& is)
     guid_t id;
     is >> id;
 
-    if (id == TradePayment::m_id)
-        p.reset(new TradePayment);
-    else
-        THROW("Unknown trade type:" << id);
+    //if (id == TradePayment::m_id) by j
+    //    p.reset(new TradePayment);
+    //else
+    //    THROW("Unknown trade type:" << id);
 
     p->load(is);
 

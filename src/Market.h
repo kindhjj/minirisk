@@ -21,7 +21,7 @@ private:
 public:
 
     typedef std::pair<string, double> risk_factor_t;
-    typedef std::vector<std::pair<string, double>> vec_risk_factor_t;
+    typedef std::vector<std::pair<string, double> > vec_risk_factor_t;
 
     Market(const std::shared_ptr<const MarketDataServer>& mds, const Date& today)
         : m_today(today)
@@ -53,7 +53,7 @@ public:
     // clear all market curves execpt for the data points
     void clear()
     {
-        std::for_each(m_curves.begin(), m_curves.end(), [](auto& p) { p.second.reset(); });
+        //std::for_each(m_curves.begin(), m_curves.end(), [](auto& p) { p.second.reset(); }); by j
     }
 
     // destroy all existing objects and modify a selected number of data points
