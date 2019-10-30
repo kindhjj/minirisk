@@ -67,7 +67,7 @@ template <typename T>
 inline my_ifstream& operator>>(my_ifstream& is, T& v)
 {
     string tmp = is.read_token();
-    //std::istringstream(tmp) >> v; by j
+    std::istringstream(tmp) >> v;
     return is;
 }
 
@@ -145,9 +145,9 @@ inline my_ifstream& operator>>(my_ifstream& is, Date& v)
 {
     string tmp;
     is >> tmp;
-    unsigned y = (unsigned)std::atoi(tmp.substr(0, 4).c_str());
-    unsigned m = (unsigned)std::atoi(tmp.substr(4, 2).c_str());
-    unsigned d = (unsigned)std::atoi(tmp.substr(6, 2).c_str());
+    unsigned y = std::atoi(tmp.substr(0, 4).c_str());
+    unsigned m = std::atoi(tmp.substr(4, 2).c_str());
+    unsigned d = std::atoi(tmp.substr(6, 2).c_str());
     v.init(y, m, d);
     return is;
 }

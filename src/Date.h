@@ -73,8 +73,8 @@ public:
     std::string to_string(bool pretty = true) const
     {
         return pretty
-            ? std::to_string((unsigned)m_d) + "-" + std::to_string((unsigned)m_m) + "-" + std::to_string(m_y)
-            : std::to_string(m_y) + padding_dates((unsigned)m_m) + padding_dates((unsigned)m_d);
+            ? std::to_string((int)m_d) + "-" + std::to_string((int)m_m) + "-" + std::to_string(m_y)
+            : std::to_string(m_y) + padding_dates((int)m_m) + padding_dates((int)m_d);
     }
 
 private:
