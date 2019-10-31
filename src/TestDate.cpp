@@ -4,8 +4,10 @@
 #include <cstdlib>
 #include <string>
 #include "Macros.h"
+#include <vector>
+#include <array>
 
-bool is_valid_date(unsigned& y, unsigned& m, unsigned& d, unsigned MAX_VALID_YR, unsigned MIN_VALID_YR) 
+bool is_valid_date(unsigned& y, unsigned& m, unsigned& d, unsigned MAX_VALID_YR=2200, unsigned MIN_VALID_YR=1900) 
 { 
     // If year, month and day are not in given range 
     if (y > MAX_VALID_YR ||  y < MIN_VALID_YR) return false; 
@@ -21,6 +23,24 @@ bool is_valid_date(unsigned& y, unsigned& m, unsigned& d, unsigned MAX_VALID_YR,
     return true; 
 } 
 
+void generate_dates(std::vector<std::array<unsigned,3>>& dates){
+    unsigned d = 1;
+    unsigned m = 1;
+    unsigned y = 1900;
+    while (y < 2200){
+        std::array<unsigned,3> date = {y, m, d};
+        dates.push_back(date);
+        d++;
+        if (!is_valid_date(y,m,d)) {
+            d = 1;
+            m++;
+        };
+        if (m > 12) {
+            m = 1;
+            y++;
+        }; 
+    }
+}
 void test1()
 {
     //time range the same as is defined in Date struct
@@ -46,29 +66,48 @@ void test1()
         }
     } while (n < 1000);
     if (n != e_n){
-        std::string msg("Generated 1000 invalid dates, but only ");
+        std::string msg("Test 1 failed: Generated 1000 invalid dates, but only ");
         msg.append(std::to_string(e_n));
         msg.append(" errors were recognized");
-        try{ MYASSERT(0, msg); } catch (const std::exception& msg_all){
-            std::cout << msg_all.what();
-        }
-    };
+        MYASSERT(0, msg);
+    }
 }
 
 void test2()
 {
-
+    std::vector<std::array<unsigned,3>> dates;
+    generate_dates(dates);
+    for (auto i1 = dates.cbegin(); i1 != dates.cend(); i1++){
+        std::array<unsigned, 3> i2_n = *i1;
+        auto i2 = i2_n.cbegin();
+        std::cout << *i2 << "-" << *(i2 + 1) << "-" << *(i2 + 2) << "\n";
+    }
 }
 
 void test3()
 {
-}
+    std::vector<std::array<unsigned,3>> dates;
+    generate_dates(dates);
+    for (auto i1 = dates.cbegin(); i1 != dates.cend(); i1++){
+        std::array<unsigned, 3> i2_n = *i1;
+        auto i2 = i2_n.cbegin();
+        minirisk::Date m_date(*i2, *(i2 + 1), *(i2 + 2));
+        unsigned date_serial_pre = m_date.serial();
+    }
 
-int main()
-{
-    test1();
-    test2();
-    test3();
+    int main()
+    {
+        try
+        {
+            test1();
+            test2();
+            test3();
+        }
+        catch (const std::exception &msg_all)
+        {
+            std::cout << msg_all.what();
+            return 1;
+    }
     std::cout << "SUCCESS.\n";
     return 0;
 }
