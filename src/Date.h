@@ -14,7 +14,6 @@ public:
     static const unsigned n_years = last_year - first_year;
 
 private:
-    static std::string padding_dates(unsigned);
 
     // number of days elapsed from beginning of the year
     unsigned day_of_year() const;
@@ -73,12 +72,14 @@ public:
 
     static bool is_leap_year(unsigned yr);
 
-    // In YYYYMMDD format
+    static std::string padding_dates(unsigned month_or_day);
+
+    // True: In DD-MM-YYYY format; False: YYYYMMDD
     std::string to_string(bool pretty = true) const
     {
         return pretty
-            ? std::to_string((int)m_d) + "-" + std::to_string((int)m_m) + "-" + std::to_string(m_y)
-            : std::to_string(m_y) + padding_dates((int)m_m) + padding_dates((int)m_d);
+            ? std::to_string(m_d) + "-" + std::to_string(m_m) + "-" + std::to_string(m_y)
+            : std::to_string(m_y) + padding_dates(m_m) + padding_dates(m_d);
     }
 
 private:

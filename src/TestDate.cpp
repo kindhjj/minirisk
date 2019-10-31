@@ -23,6 +23,7 @@ bool is_valid_date(unsigned& y, unsigned& m, unsigned& d, unsigned MAX_VALID_YR=
     return true; 
 } 
 
+//To generate a complete list of dates from 1900-1-1 to 2199-12-31
 void generate_dates(std::vector<std::array<unsigned,3>>& dates){
     unsigned d = 1;
     unsigned m = 1;
@@ -53,9 +54,9 @@ void test1()
     unsigned e_n = 0;   //invalid date recognized
 
     do{
-        unsigned y = rand() % (MAX_VALID_YR - MIN_VALID_YR) + MIN_VALID_YR; //generate random date
-        unsigned m = rand() % MAX_VALID_MH + 1;
-        unsigned d = rand() % MAX_VALID_DY + 1;
+        unsigned y = (unsigned int)rand() % (MAX_VALID_YR - MIN_VALID_YR) + MIN_VALID_YR; //generate random date
+        unsigned m = (unsigned int)rand() % MAX_VALID_MH + 1;
+        unsigned d = (unsigned int)rand() % MAX_VALID_DY + 1;
         if (is_valid_date(y, m, d, MAX_VALID_YR, MIN_VALID_YR)==false){
             n++;
             try{
@@ -66,9 +67,7 @@ void test1()
         }
     } while (n < 1000);
     if (n != e_n){
-        std::string msg("Test 1 failed: Generated 1000 invalid dates, but only ");
-        msg.append(std::to_string(e_n));
-        msg.append(" errors were recognized");
+        std::string msg("Test 1 failed: Generated 1000 invalid dates, but only " + std::to_string(e_n) + " errors were recognized");
         MYASSERT(0, msg);
     }
 }
@@ -80,7 +79,15 @@ void test2()
     for (auto i1 = dates.cbegin(); i1 != dates.cend(); i1++){
         std::array<unsigned, 3> i2_n = *i1;
         auto i2 = i2_n.cbegin();
-        std::cout << *i2 << "-" << *(i2 + 1) << "-" << *(i2 + 2) << "\n";
+        minirisk::Date m_date(*i2, *(i2 + 1), *(i2 + 2));
+        std::string str_date;
+        str_date = std::to_string(*(i2 + 2)) + "-" + std::to_string(*(i2 + 1)) + "-" + std::to_string(*(i2));
+        if (str_date != m_date.to_string())
+        {
+            //to check whether the output is consistent
+            std::string msg("Test 2 failed:" + str_date+" not consistent.");
+            MYASSERT(0, msg);
+        }
     }
 }
 
@@ -88,26 +95,35 @@ void test3()
 {
     std::vector<std::array<unsigned,3>> dates;
     generate_dates(dates);
-    for (auto i1 = dates.cbegin(); i1 != dates.cend(); i1++){
-        std::array<unsigned, 3> i2_n = *i1;
-        auto i2 = i2_n.cbegin();
-        minirisk::Date m_date(*i2, *(i2 + 1), *(i2 + 2));
-        unsigned date_serial_pre = m_date.serial();
-    }
-
-    int main()
+    //std::array<unsigned, 3> a = dates[0];
+    minirisk::Date first_date((dates.at(0))[0], (dates.at(0))[1], (dates.at(0))[2]);
+    //generate the first serial date
+    unsigned date_serial_lead = first_date.serial();
+    for (auto i1 = dates.cbegin() + 1; i1 != dates.cend(); i1++)
     {
-        try
-        {
-            test1();
-            test2();
-            test3();
+        minirisk::Date m_date((*i1)[0], (*i1)[1], (*i1)[2]);
+        unsigned date_serial_lag = m_date.serial();
+        if (date_serial_lag-date_serial_lead!=1){
+            std::string msg("Test 3 failed: " + m_date.to_string() + " not continuous with previous date.");
+            MYASSERT(0, msg);
         }
-        catch (const std::exception &msg_all)
-        {
-            std::cout << msg_all.what();
-            return 1;
+        date_serial_lead = date_serial_lag;
     }
+}
+
+int main()
+{
+    try
+    {
+        test1();
+        test2();
+        test3();
+    }
+    catch (const std::exception &msg_all)
+    {
+        std::cout << msg_all.what();
+        return 1;
+    };
     std::cout << "SUCCESS.\n";
     return 0;
 }
