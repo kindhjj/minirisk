@@ -72,14 +72,14 @@ void test1()
     }
 }
 
-void test2()
+void test2(std::vector<std::array<unsigned,3>>& dates)
 {
-    std::vector<std::array<unsigned,3>> dates;
-    generate_dates(dates);
-    for (auto i1 = dates.cbegin(); i1 != dates.cend(); i1++){
+    unsigned date_counter = 0;
+    for (auto i1 = dates.cbegin(); i1 != dates.cend(); i1++)
+    {
         std::array<unsigned, 3> i2_n = *i1;
         auto i2 = i2_n.cbegin();
-        minirisk::Date m_date(*i2, *(i2 + 1), *(i2 + 2));
+        minirisk::Date m_date(date_counter++);
         std::string str_date;
         str_date = std::to_string(*(i2 + 2)) + "-" + std::to_string(*(i2 + 1)) + "-" + std::to_string(*(i2));
         if (str_date != m_date.to_string())
@@ -91,18 +91,15 @@ void test2()
     }
 }
 
-void test3()
+void test3(std::vector<std::array<unsigned,3>>& dates)
 {
-    std::vector<std::array<unsigned,3>> dates;
-    generate_dates(dates);
-    //std::array<unsigned, 3> a = dates[0];
     minirisk::Date first_date((dates.at(0))[0], (dates.at(0))[1], (dates.at(0))[2]);
     //generate the first serial date
-    unsigned date_serial_lead = first_date.serial();
+    unsigned date_serial_lead = first_date.get_serial();
     for (auto i1 = dates.cbegin() + 1; i1 != dates.cend(); i1++)
     {
         minirisk::Date m_date((*i1)[0], (*i1)[1], (*i1)[2]);
-        unsigned date_serial_lag = m_date.serial();
+        unsigned date_serial_lag = m_date.get_serial();
         if (date_serial_lag-date_serial_lead!=1){
             std::string msg("Test 3 failed: " + m_date.to_string() + " not continuous with previous date.");
             MYASSERT(0, msg);
@@ -116,8 +113,10 @@ int main()
     try
     {
         test1();
-        test2();
-        test3();
+        std::vector<std::array<unsigned,3>> dates;
+        generate_dates(dates);
+        test2(dates);
+        test3(dates);
     }
     catch (const std::exception &msg_all)
     {

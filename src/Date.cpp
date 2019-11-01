@@ -44,19 +44,48 @@ void Date::check_valid(unsigned y, unsigned m, unsigned d)
     MYASSERT(d >= 1 && d <= dmax, "The day must be a integer between 1 and " << dmax << ", got " << d);
 }
 
+void Date::check_valid(unsigned input_serial){
+    MYASSERT(input_serial >= 0 && input_serial < days_epoch.back()+365, "Input date " << std::to_string(input_serial) << " out of bound.");
+}
+
 unsigned Date::day_of_year() const
 {
     return days_ytd[m_m - 1] + ((m_m > 2 && m_is_leap) ? 1 : 0) + (m_d - 1);
 }
 
+// calculate m_y,m_m,m_d from serial number
+void Date::calculate_ymd(){
+    unsigned days_remain;
+    for (auto i = days_epoch.cbegin(); m_serial >= *i; i++)
+    {
+        m_y++;
+        days_remain = *i;
+    }
+    days_remain = m_serial - days_remain + 1;
+    unsigned month = 1;
+    for (auto i = days_in_month.cbegin(); days_remain > *i; i++)
+    {
+        if (is_leap_year(m_y) && month == 2){
+            if (days_remain > 29) { 
+                days_remain -= 29;
+                month++;
+            }}
+        else{
+                days_remain -= *i;
+                month ++ ;
+            }
+    }
+    m_d = static_cast<unsigned char>(days_remain);
+    m_m = static_cast<unsigned char>(month);
+}
 
 /*  The function calculates the distance between two Dates.
     d1 > d2 is allowed, which returns the negative of d2-d1.
 */
 long operator-(const Date& d1, const Date& d2)
 {
-    unsigned s1 = d1.serial();
-    unsigned s2 = d2.serial();
+    unsigned s1 = d1.get_serial();
+    unsigned s2 = d2.get_serial();
     return static_cast<long>(s1) - static_cast<long>(s2);
 }
 

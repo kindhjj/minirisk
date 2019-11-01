@@ -26,12 +26,17 @@ private:
 
 public:
     // Default constructor
-    Date() : m_y(1970), m_m(1), m_d(1), m_is_leap(false), m_serial(this->serial()) {}
+    Date() : m_y(1970), m_m(1), m_d(1), m_is_leap(false), m_serial(this->to_serial()) {}
 
     // Constructor where the input value is checked.
     Date(unsigned year, unsigned month, unsigned day)
     {
         init(year, month, day);
+    }
+
+    // Constructor where the input value is serial.
+    Date(unsigned input_serial){
+        init(input_serial);
     }
 
     void init(unsigned year, unsigned month, unsigned day)
@@ -41,10 +46,18 @@ public:
         m_m = (unsigned char) month;
         m_d = (unsigned char) day;
         m_is_leap = is_leap_year(year);
-        m_serial = (unsigned)this->serial();
+        m_serial = (unsigned)this->to_serial();
+    }
+
+    void init(unsigned input_serial){
+        check_valid(input_serial);
+        m_y = 1899;
+        m_serial = input_serial;
+        calculate_ymd();
     }
 
     static void check_valid(unsigned y, unsigned m, unsigned d);
+    static void check_valid(unsigned date_serial);
 
     bool operator<(const Date& d) const
     {
@@ -64,22 +77,24 @@ public:
         return (this->m_serial) > d.m_serial;
     }
 
-    // number of days since 1-Jan-1900
-    unsigned serial() const
-    {
-        return days_epoch[m_y - 1900] + day_of_year();
+    // get m_serial
+    unsigned get_serial() const {
+        return m_serial;
     }
 
     static bool is_leap_year(unsigned yr);
 
     static std::string padding_dates(unsigned month_or_day);
 
+    void calculate_ymd();
+
     // True: In DD-MM-YYYY format; False: YYYYMMDD
     std::string to_string(bool pretty = true) const
     {
         return pretty
-            ? std::to_string(m_d) + "-" + std::to_string(m_m) + "-" + std::to_string(m_y)
-            : std::to_string(m_y) + padding_dates(m_m) + padding_dates(m_d);
+                ? std::to_string(m_d) + "-" + std::to_string(m_m) + "-" + std::to_string(m_y)
+                //: std::to_string(m_y) + padding_dates(m_m) + padding_dates(m_d);
+                : std::to_string(m_serial);
     }
 
 private:
@@ -88,6 +103,12 @@ private:
     unsigned char m_d;
     bool m_is_leap;
     unsigned m_serial;  //the corresponding serial date number
+
+    // number of days since 1-Jan-1900
+    unsigned to_serial() const
+    {
+        return days_epoch[m_y - 1900] + day_of_year();
+    }
 };
 
 long operator-(const Date& d1, const Date& d2);

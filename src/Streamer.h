@@ -145,10 +145,11 @@ inline my_ifstream& operator>>(my_ifstream& is, Date& v)
 {
     string tmp;
     is >> tmp;
-    unsigned y = (unsigned int)std::atoi(tmp.substr(0, 4).c_str());
-    unsigned m = (unsigned int)std::atoi(tmp.substr(4, 2).c_str());
-    unsigned d = (unsigned int)std::atoi(tmp.substr(6, 2).c_str());
-    v.init(y, m, d);
+    // unsigned y = (unsigned int)std::atoi(tmp.substr(0, 4).c_str());
+    // unsigned m = (unsigned int)std::atoi(tmp.substr(4, 2).c_str());
+    // unsigned d = (unsigned int)std::atoi(tmp.substr(6, 2).c_str());
+    unsigned ser = (unsigned int)std::atoi(tmp.c_str());
+    v.init(ser);
     return is;
 }
 
