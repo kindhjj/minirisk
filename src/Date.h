@@ -11,7 +11,7 @@ struct Date
 public:
     static const unsigned first_year = 1900;
     static const unsigned last_year = 2200;
-    static const unsigned n_years = last_year - first_year;
+    static const unsigned n_years = last_year - first_year + 1;
 
 private:
 
@@ -51,7 +51,7 @@ public:
 
     void init(unsigned input_serial){
         check_valid(input_serial);
-        m_y = 1899;
+        m_y = 1900;
         m_serial = input_serial;
         calculate_ymd();
     }

@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <algorithm>
 
 #include "Date.h"
 
@@ -45,7 +46,7 @@ void Date::check_valid(unsigned y, unsigned m, unsigned d)
 }
 
 void Date::check_valid(unsigned input_serial){
-    MYASSERT(input_serial >= 0 && input_serial < days_epoch.back()+365, "Input date " << std::to_string(input_serial) << " out of bound.");
+    MYASSERT(input_serial >= 0 && input_serial < days_epoch.back(), "Input date " << std::to_string(input_serial) << " out of bound.");
 }
 
 unsigned Date::day_of_year() const
@@ -56,12 +57,9 @@ unsigned Date::day_of_year() const
 // calculate m_y,m_m,m_d from serial number
 void Date::calculate_ymd(){
     unsigned days_remain;
-    for (auto i = days_epoch.cbegin(); m_serial >= *i; i++)
-    {
-        m_y++;
-        days_remain = *i;
-    }
-    days_remain = m_serial - days_remain + 1;
+    auto find_year = std::adjacent_find(days_epoch.begin(), days_epoch.end(), [&](unsigned v1, unsigned v2) -> bool {return v1 <= m_serial && m_serial < v2; });
+    m_y += static_cast<unsigned short>(std::distance(days_epoch.begin(), find_year));
+    days_remain = m_serial - *find_year + 1;
     unsigned month = 1;
     for (auto i = days_in_month.cbegin(); days_remain > *i; i++)
     {
