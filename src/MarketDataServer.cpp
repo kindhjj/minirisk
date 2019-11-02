@@ -15,7 +15,7 @@ string mds_spot_name(const string& name)
     return name.substr(0, name.length() - 4);
 }
 
-MarketDataServer::MarketDataServer(const string& filename)
+MarketDataServer::MarketDataServer(const string& filename)  //read names and values from risk_factor_file
 {
     std::ifstream is(filename);
     MYASSERT(!is.fail(), "Could not open file " << filename);
@@ -47,6 +47,7 @@ std::pair<double, bool> MarketDataServer::lookup(const string& name) const
 std::vector<std::string> MarketDataServer::match(const std::string& expr) const
 {
     std::regex r(expr);
+    std::vector<std::string> found;
     NOT_IMPLEMENTED;
 }
 

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdint>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -12,8 +14,11 @@ using namespace std;
 int main()
 {
     union { double d; uint64_t u; } tmp;
-    double x = -0.15625;
-    tmp.d = x;
-    cout << hex << tmp.u << endl;
+    istringstream st("4034000000000000");
+    //double x = 10.0;
+    st >> hex >> tmp.u;
+    //tmp.d = x;
+    //cout << hex << tmp.u << endl;
+    cout << tmp.d;
     return 0;
 }

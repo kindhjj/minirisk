@@ -6,7 +6,7 @@
 namespace minirisk {
 
 template <typename I, typename T>
-std::shared_ptr<const I> Market::get_curve(const string& name)
+std::shared_ptr<const I> Market::get_curve(const string& name)   //copy discount curve from mds to mkt
 {
     ptr_curve_t& curve_ptr = m_curves[name];
     if (!curve_ptr.get())

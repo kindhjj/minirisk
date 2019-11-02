@@ -20,6 +20,9 @@ private:
     Date   m_today;
     string m_name;
     double m_rate;
+    // unsigned m_expr;
+    // unsigned m_expr_date;
+    // double m_df;
 };
 
 } // namespace minirisk

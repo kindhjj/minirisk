@@ -30,7 +30,7 @@ void generate_dates(std::vector<std::array<unsigned,3>>& dates){
     unsigned y = 1900;
     while (y < 2200){
         std::array<unsigned,3> date = {y, m, d};
-        dates.push_back(date);
+        dates.emplace_back(date);
         d++;
         if (!is_valid_date(y,m,d)) {
             d = 1;
