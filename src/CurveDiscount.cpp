@@ -13,7 +13,7 @@ CurveDiscount::CurveDiscount(Market *mkt, const Date& today, const string& curve
     , m_rate(mkt->get_yield(curve_name.substr(ir_curve_discount_prefix.length(),3)))
 {
 }
-
+    //to do No4
 double  CurveDiscount::df(const Date& t) const
 {
     MYASSERT((!(t < m_today)), "cannot get discount factor for date in the past: " << t);
