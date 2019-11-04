@@ -113,9 +113,9 @@ private:
 
 long operator-(const Date& d1, const Date& d2);
 
-inline double time_frac(const Date& d1, const Date& d2)
+inline unsigned time_frac(const Date& d1, const Date& d2)
 {
-    return static_cast<double>(d2 - d1) / 365.0;
+    return static_cast<unsigned>(d2 - d1);
 }
 
 } // namespace minirisk

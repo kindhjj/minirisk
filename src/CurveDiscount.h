@@ -12,17 +12,24 @@ struct CurveDiscount : ICurveDiscount
     CurveDiscount(Market *mkt, const Date& today, const string& curve_name);
 
     // compute the discount factor
-    double df(const Date& t) const;
+    double df() const;
 
     virtual Date today() const { return m_today; }
+
+    double get_rate_tenor() const;
+
+    unsigned get_tenor() const;
+
+    void set_rate(const double &rate);
 
 private:
     Date   m_today;
     string m_name;
     double m_rate;
-    // unsigned m_expr;
-    // unsigned m_expr_date;
-    // double m_df;
+    //store tenor in days
+    unsigned m_tenor;
+    //cache rate*tenor/365 terms
+    double m_rate_tenor;
 };
 
 } // namespace minirisk

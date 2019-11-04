@@ -9,16 +9,25 @@ namespace minirisk {
 
 CurveDiscount::CurveDiscount(Market *mkt, const Date& today, const string& curve_name)
     : m_today(today)
-    , m_name(curve_name)
-    , m_rate(mkt->get_yield(curve_name.substr(ir_curve_discount_prefix.length(),3)))
+    , m_name(ir_rate_prefix + curve_name)    
+    , m_rate(mkt->get_yield(curve_name))
+    , m_tenor(mkt->transferdate(curve_name.substr(0,curve_name.length() - 4)))
 {
+    m_rate_tenor = m_rate * m_tenor / 365.0;
 }
-    //to do No4
-double  CurveDiscount::df(const Date& t) const
+
+double  CurveDiscount::df() const
 {
-    MYASSERT((!(t < m_today)), "cannot get discount factor for date in the past: " << t);
-    double dt = time_frac(m_today, t);
-    return std::exp(-m_rate * dt);
+    return m_rate;
+}
+
+double CurveDiscount::get_rate_tenor() const { return m_rate_tenor; }
+
+unsigned CurveDiscount::get_tenor() const { return m_tenor; }
+
+void CurveDiscount::set_rate(const double& rate) {
+    m_rate = rate;
+    m_rate_tenor = m_rate * m_tenor / 365.0;
 }
 
 } // namespace minirisk

@@ -2,6 +2,7 @@
 
 #include <map>
 #include <regex>
+#include <vector>
 #include "Global.h"
 
 namespace minirisk {
@@ -18,6 +19,7 @@ public:
     double get(const string& name) const;
     std::pair<double, bool> lookup(const string& name) const;
     std::vector<std::string> match(const std::string& expr) const;
+    std::vector<string> match_ir(const string &ccy) const;
 
 private:
     // for simplicity, assumes market data can only have type double

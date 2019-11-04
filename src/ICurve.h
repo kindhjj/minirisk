@@ -29,7 +29,10 @@ typedef std::shared_ptr<const ICurveDiscount> ptr_disc_curve_t;
 struct ICurveDiscount : ICurve
 {
     // compute the discount factor for date t
-    virtual double df(const Date& t) const = 0;
+    virtual double df() const = 0;
+    virtual double get_rate_tenor() const = 0;
+    virtual unsigned get_tenor() const = 0;
+    virtual void set_rate(const double &rate) = 0;
 };
 
 struct ICurveFXForward : ICurve
@@ -45,5 +48,6 @@ struct ICurveFXSpot : ICurve
     virtual double spot() const = 0;
 };
 
+    
 } // namespace minirisk
 

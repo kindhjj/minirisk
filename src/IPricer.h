@@ -9,9 +9,9 @@ namespace minirisk {
 
 struct IPricer : IObject
 {
-    virtual double price(Market& m) const = 0;
+    virtual double price(Market& m, const string& Iobj) const = 0;
+    virtual string get_ir_curve() const = 0;
 };
-
 
 typedef std::shared_ptr<const IPricer> ppricer_t;
 
