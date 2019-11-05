@@ -44,11 +44,23 @@ std::pair<double, bool> MarketDataServer::lookup(const string& name) const
             : std::make_pair(std::numeric_limits<double>::quiet_NaN(), false);
 }
 
-std::vector<std::string> MarketDataServer::match(const std::string& expr) const
-{
-    std::regex r(expr);
-    std::vector<std::string> found;
-    NOT_IMPLEMENTED;
+
+//fetch all risk factors of the corresponding currency to a vector
+std::vector<string> MarketDataServer::match_ir(const string& ccy) const{
+    std::regex full("IR\\..*" + ccy);
+    std::smatch full_matched;
+    std::vector<string> matched_v;
+    matched_v.reserve(m_data.size());
+    for (auto tr : m_data)
+    {
+        bool if_full_match = std::regex_match(tr.first, full_matched, full);
+        if (if_full_match)
+        {
+            string matched_s(full_matched[0]);
+            matched_v.emplace_back(matched_s.substr(3));
+        }
+    }
+    return matched_v;
 }
 
 } // namespace minirisk

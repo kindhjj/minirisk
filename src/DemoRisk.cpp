@@ -31,7 +31,7 @@ void run(const string& portfolio_file, const string& risk_factors_file)
     // Price all products. Market objects are automatically constructed on demand,
     // fetching data as needed from the market data server.
     {
-        auto prices = compute_prices(pricers, mkt);
+        auto prices = compute_prices(pricers, mkt, "compute pv");
         print_price_vector("PV", prices);
     }
 
@@ -48,11 +48,17 @@ void run(const string& portfolio_file, const string& risk_factors_file)
     }
 
     {   // Compute PV01 (i.e. sensitivity with respect to interest rate dV/dr)
-        std::vector<std::pair<string, portfolio_values_t>> pv01(compute_pv01(pricers,mkt));  // PV01 per trade
+        std::vector<std::pair<string, portfolio_values_t>> pv01_bucketed(compute_pv01_bucketed(pricers,mkt));  // PV01 per trade
 
-        // display PV01 per currency
-        for (const auto& g : pv01)
-            print_price_vector("PV01 " + g.first, g.second);
+        // display PV01 bucketed per currency
+        for (const auto& g : pv01_bucketed)
+            print_price_vector("PV01 bucketed " + g.first, g.second);
+
+        std::vector<std::pair<string, portfolio_values_t>> pv01_parallel(compute_pv01_parallel(pricers,mkt));
+
+        // display PV01 parallel per currency
+        for (const auto& g : pv01_parallel)
+            print_price_vector("PV01 parallel " + g.first, g.second);
     }
 }
 

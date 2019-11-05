@@ -23,6 +23,8 @@ public:
     typedef std::pair<string, double> risk_factor_t;
     typedef std::vector<std::pair<string, double>> vec_risk_factor_t;
 
+    Market(){}
+    
     Market(const std::shared_ptr<const MarketDataServer>& mds, const Date& today)
         : m_today(today)
         , m_mds(mds)
@@ -47,6 +49,8 @@ public:
         m_mds.reset();
     }
 
+    const std::shared_ptr<const MarketDataServer> get_mds() const { return m_mds; }
+
     // returns risk factors matching a regular expression
     vec_risk_factor_t get_risk_factors(const std::string& expr) const;
 
@@ -58,6 +62,14 @@ public:
 
     // destroy all existing objects and modify a selected number of data points
     void set_risk_factors(const vec_risk_factor_t& risk_factors);
+
+    const unsigned transferdate(const string &tenor_sub);
+
+    const std::pair<double, unsigned> get_term_rate_and_tenor(const string& ccy) const;
+
+    //reset curve according to risk factors
+    template <typename I, typename T>
+    void reset_curve(const std::pair<string, double>& rf);
 
 private:
     Date m_today;
