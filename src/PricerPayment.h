@@ -13,7 +13,7 @@ struct PricerPayment : IPricer
 
     PricerPayment(const TradePayment& trd);
 
-    virtual double price(Market& mkt, const string& str) const;
+    virtual std::pair<double, string> price(Market& mkt, const string& str) const;
 
     void get_interval(const Market &mkt, bound_t &lower_bound, bound_t &higher_bound, bool& tenor_ticker, const string &m_name, const unsigned &dt) const;
 
