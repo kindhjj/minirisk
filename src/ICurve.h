@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <map>
 
 #include "IObject.h"
 #include "Date.h"
@@ -28,11 +29,8 @@ typedef std::shared_ptr<const ICurveDiscount> ptr_disc_curve_t;
 
 struct ICurveDiscount : ICurve
 {
-    // compute the discount factor for date t
-    virtual double df() const = 0;
-    virtual double get_rate_tenor() const = 0;
-    virtual unsigned get_tenor() const = 0;
-    virtual void set_rate(const double &rate) = 0;
+    virtual double df(const Date& m_dt, const unsigned& dt) const = 0;
+    virtual void set_rate(const unsigned &tenor, const double &rate) = 0;
 };
 
 struct ICurveFXForward : ICurve

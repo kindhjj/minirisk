@@ -19,7 +19,7 @@ typedef std::pair<double, portfolio_nan_vec> portfolio_values_nan_t;
 std::vector<ppricer_t> get_pricers(const portfolio_t& portfolio);
 
 // compute prices
-portfolio_values_t compute_prices(const std::vector<ppricer_t>& pricers, Market& mkt, const string& Iobj);
+portfolio_values_t compute_prices(const std::vector<ppricer_t>& pricers, Market& mkt);
 
 // compute the cumulative book value
 portfolio_values_nan_t portfolio_total(const portfolio_values_t &values);

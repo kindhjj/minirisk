@@ -46,7 +46,7 @@ std::pair<double, bool> MarketDataServer::lookup(const string& name) const
 
 
 //fetch all risk factors of the corresponding currency to a vector
-std::vector<string> MarketDataServer::match_ir(const string& ccy) const{
+std::vector<string> MarketDataServer::get_ir_vector(const string& ccy) const{
     std::regex full("IR\\..*" + ccy);
     std::smatch full_matched;
     std::vector<string> matched_v;

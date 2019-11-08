@@ -37,7 +37,7 @@ public:
     const ptr_disc_curve_t get_discount_curve(const string& name);
 
     // yield rate for currency name
-    const double get_yield(const string& name);
+    const std::map<unsigned, double> get_yield(const string &ccyname);
 
     // fx exchange rate to convert 1 unit of ccy1 into USD
     const double get_fx_spot(const string& ccy);
@@ -65,7 +65,7 @@ public:
 
     const unsigned transferdate(const string &tenor_sub);
 
-    const std::pair<double, unsigned> get_term_rate_and_tenor(const string& ccy) const;
+    const bool find_ccy_rate(const string& ccy) const;
 
     //reset curve according to risk factors
     template <typename I, typename T>

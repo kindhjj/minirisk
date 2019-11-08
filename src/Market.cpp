@@ -34,10 +34,14 @@ double Market::from_mds(const string& objtype, const string& name)
     return ins.first->second;
 }
 
-const double Market::get_yield(const string& ccyname)
+const std::map<unsigned, double> Market::get_yield(const string& ccyname)
 {
+    std::map<unsigned, double> yield_curve;
     string name(ir_rate_prefix + ccyname);
-    return from_mds("yield curve", name);
+    std::vector<string> ir_tenor_name = m_mds->get_ir_vector(ccyname);
+    for (auto ir_tn : ir_tenor_name)
+        yield_curve[transferdate(ir_tn.substr(0, ir_tn.length() - 4))] = from_mds("yield curve", ir_rate_prefix + ir_tn);
+    return yield_curve;
 };
 
 const double Market::get_fx_spot(const string& name)
@@ -52,7 +56,6 @@ void Market::set_risk_factors(const vec_risk_factor_t& risk_factors)
         auto i = m_risk_factors.find(d.first);
         MYASSERT((i != m_risk_factors.end()), "Risk factor not found " << d.first);
         i->second = d.second;
-        //std::pair<string, double> rf_pair = std::make_pair(d.first, d.second);
         reset_curve<ICurveDiscount, ICurve>(d);
     }
 }
@@ -65,7 +68,7 @@ Market::vec_risk_factor_t Market::get_risk_factors(const std::string& expr) cons
         if (std::regex_match(d.first, r))
             result.push_back(d);
     return result;
-}
+} 
 
 //transform a "10M" like term to a number
 const unsigned Market::transferdate(const string& tenor_sub){
@@ -90,31 +93,28 @@ const unsigned Market::transferdate(const string& tenor_sub){
     return static_cast<unsigned>(std::stoi(tenor_sub.substr(0, tenor_sub.length() - 1))) * multiplier;
 }
 
-//extract tenor info form a risk factor token
-const std::pair<double, unsigned> Market::get_term_rate_and_tenor(const string& ccy) const{
-    string f_name;
-    if (ccy.substr(0, ir_curve_discount_prefix.length()) == ir_curve_discount_prefix)
-        f_name = ir_rate_prefix + ccy.substr(ir_curve_discount_prefix.length());
-    else if (ccy.substr(0, ir_rate_prefix.length()) == ir_rate_prefix)
-        f_name = ccy;
-    else
-        f_name = ir_rate_prefix + ccy;
-    auto d = m_curves.find(f_name);
-    MYASSERT((d != m_curves.end()), "Term rate not found " << ccy);
-    ptr_curve_t found_curve = d->second;
-    ptr_disc_curve_t found_curve_ptr = std::dynamic_pointer_cast<const ICurveDiscount>(found_curve);
-    return std::make_pair(found_curve_ptr->get_rate_tenor(), found_curve_ptr->get_tenor());
+const bool Market::find_ccy_rate(const string& ccy) const{
+    std::regex find_ccy("IR\\..*" + ccy);
+    std::smatch full_matched;
+    bool if_full_match=false;
+    for (auto m_rf : m_risk_factors){
+        if_full_match = std::regex_match(m_rf.first, full_matched, find_ccy);
+        if (if_full_match)
+            return true;
+    }
+    return false;
 }
 
 template <typename I, typename T>
 void Market::reset_curve(const std::pair<string, double>& rf){
-    auto found_curve = m_curves.find(rf.first);
-    MYASSERT(found_curve != m_curves.end(), "No such risk factors found at curve: " << rf.first);
+    string ccy = rf.first.substr(rf.first.length() - 3);
+    unsigned tenor = transferdate(rf.first.substr(3, rf.first.length() - 7));
+    auto found_curve = m_curves.find(ir_rate_prefix + ccy);
+    MYASSERT(found_curve != m_curves.end(), "No such risk factors found at curve: " <<  ir_rate_prefix + ccy);
     std::shared_ptr<const T> found_c = found_curve->second;
     std::shared_ptr<const I> found_curve_ptr = std::dynamic_pointer_cast<const I>(found_c);
     const ICurveDiscount *ic_c = found_curve_ptr.get();
     ICurveDiscount *ic = const_cast<ICurveDiscount *>(ic_c);
-    //sss->get_rateset_rate(iter.second);
-    ic->set_rate(rf.second);
+    ic->set_rate(tenor, rf.second);
 }
 } // namespace minirisk
