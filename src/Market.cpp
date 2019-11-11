@@ -17,6 +17,17 @@ std::shared_ptr<const I> Market::get_curve(const string& name)   //copy discount
     return res;
 }
 
+template <typename I, typename T>
+std::shared_ptr<const I> Market::get_fxsp(const string& name)   //read fx spot from mds to mkt
+{
+    ptr_fxsp_t &curve_ptr = m_fxsp[name];
+    if (!curve_ptr.get())
+        curve_ptr.reset(new T(this, m_today, name));
+    std::shared_ptr<const I> res = std::dynamic_pointer_cast<const I>(curve_ptr);
+    MYASSERT(res, "Cannot cast object with name " << name << " to type " << typeid(I).name());
+    return res;
+}
+
 const ptr_disc_curve_t Market::get_discount_curve(const string& name)
 {
     return get_curve<ICurveDiscount, CurveDiscount>(ir_rate_prefix + name);
@@ -72,7 +83,7 @@ const double Market::get_fx_spot(const string& name)
 
 const ptr_fxsp_t Market::get_fx_ptr(const string& ccy)
 {
-    return get_curve<ICurveFXSpot, CurveFXSpot>(mds_spot_name(ccy));
+    return get_fxsp<ICurveFXSpot, CurveFXSpot>(mds_spot_name(ccy));
 }
 
 void Market::set_risk_factors(const vec_risk_factor_t& risk_factors)

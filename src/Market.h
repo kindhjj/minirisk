@@ -17,7 +17,7 @@ private:
     std::shared_ptr<const I> get_curve(const string& name);
 
     template <typename I, typename T>
-    std::shared_ptr<const I> get_fx(const string &name);
+    std::shared_ptr<const I> get_fxsp(const string &name);
 
     double from_mds(const string& objtype, const string& name);
 
@@ -82,6 +82,9 @@ private:
 
     // market curves
     std::map<string, ptr_curve_t> m_curves;
+
+    // fx spot rate
+    std::map<string, ptr_fxsp_t> m_fxsp;
 
     // raw risk factors
     std::map<string, double> m_risk_factors;
