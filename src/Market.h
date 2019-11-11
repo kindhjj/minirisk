@@ -17,7 +17,7 @@ private:
     std::shared_ptr<const I> get_curve(const string& name);
 
     template <typename I, typename T>
-    std::shared_ptr<const I> get_fx(const string &name);
+    std::shared_ptr<const I> get_fxsp(const string &name);
 
     double from_mds(const string& objtype, const string& name);
 
@@ -68,6 +68,8 @@ public:
     // destroy all existing objects and modify a selected number of data points
     void set_risk_factors(const vec_risk_factor_t& risk_factors);
 
+    void set_fx_risk_factors(const vec_risk_factor_t &risk_factors);
+
     const unsigned transferdate(const string &tenor_sub);
 
     const bool find_ccy_rate(const string& ccy) const;
@@ -76,12 +78,17 @@ public:
     template <typename I, typename T>
     void reset_curve(const std::pair<string, double>& rf);
 
+    void reset_spot();
+
 private:
     Date m_today;
     std::shared_ptr<const MarketDataServer> m_mds;
 
     // market curves
     std::map<string, ptr_curve_t> m_curves;
+
+    // fx spot rate
+    std::map<string, ptr_fxsp_t> m_fxsp;
 
     // raw risk factors
     std::map<string, double> m_risk_factors;

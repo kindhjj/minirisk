@@ -148,6 +148,51 @@ std::vector<std::pair<string, portfolio_values_t>> compute_pv01_parallel(const s
     return pv01_parallel;
 }
 
+std::vector<std::pair<string, portfolio_values_t>> compute_fx_delta(const std::vector<ppricer_t> &pricers, const Market &mkt)
+{
+    std::vector<std::pair<string, portfolio_values_t>> fx_delta;
+
+    const double bump_size = 0.1 / 100;
+
+    // filter fx factors
+    auto base = mkt.get_risk_factors(fx_spot_prefix + "[A-Z]{3}");
+
+    fx_delta.reserve(base.size());
+    Market tmpmkt(mkt);
+
+    for (const auto &d : base)
+    {
+        std::vector<std::pair<double, string>> pv_up, pv_dn;
+        std::vector<std::pair<string, double>> bumped(1, d);
+        fx_delta.emplace_back(std::make_pair(d.first, std::vector<std::pair<double, string>>(pricers.size())));
+
+        // bump down and price
+        bumped[0].second = d.second - bump_size;
+        tmpmkt.set_fx_risk_factors(bumped);
+        pv_dn = compute_prices(pricers, tmpmkt);
+
+        // bump up and price
+        bumped[0].second = d.second + bump_size;
+        tmpmkt.set_fx_risk_factors(bumped);
+        pv_up = compute_prices(pricers, tmpmkt);
+
+        bumped[0].second = d.second;
+        tmpmkt.set_fx_risk_factors(bumped);
+
+        // compute estimator of the derivative via central finite differences
+        double dr = 2.0 * bump_size;
+        std::transform(pv_up.begin(), pv_up.end(), pv_dn.begin(), fx_delta.back().second.begin(),
+                       [dr](std::pair<double, string> hi, std::pair<double, string> lo) -> std::pair<double, string> {
+                           if (!std::isnan(lo.first) && !std::isnan(hi.first))
+                               return std::make_pair((hi.first - lo.first) / dr, string());
+                           else
+                               return lo;
+                       });
+    }
+
+    return fx_delta;
+}
+
 ptrade_t load_trade(my_ifstream& is)
 {
     string name;

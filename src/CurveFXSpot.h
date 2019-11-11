@@ -14,6 +14,8 @@ struct CurveFXSpot : ICurveFXSpot
 
     CurveFXSpot(Market *mkt, const Date& today, const string& curve_name);
 
+    CurveFXSpot(Market *mkt, const Date &today, const double rate);
+
     double spot() const;
 
 private:
