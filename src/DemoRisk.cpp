@@ -84,6 +84,8 @@ int main(int argc, const char **argv)
             portfolio = value;
         else if (key == "-f")
             riskfactors = value;
+        else if (key == "-b")
+            base_ccy = value;
         else
             usage();
     }

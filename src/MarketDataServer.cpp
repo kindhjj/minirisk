@@ -10,8 +10,8 @@ namespace minirisk {
 string mds_spot_name(const string& name)
 {
     // NOTE: in a real system error checks should be stricter, not just on the last 3 characters
-    MYASSERT((name.substr(name.length() - 3, 3) == "USD"),
-        "Only FX pairs in the format FX.SPOT.CCY.USD can be queried. Got " << name);
+    // MYASSERT((name.substr(name.length() - 3, 3) == "USD"),
+    //     "Only FX pairs in the format FX.SPOT.CCY.USD can be queried. Got " << name);
     return name.substr(0, name.length() - 4);
 }
 
@@ -24,8 +24,11 @@ MarketDataServer::MarketDataServer(const string& filename)  //read names and val
         double value;
         is >> name >> value;
         //std::cout << name << " " << value << "\n";
-        auto ins = m_data.emplace(name, value);
-        MYASSERT(ins.second, "Duplicated risk factor: " << name);
+        if (!name.empty())
+        {
+            auto ins = m_data.emplace(name, value);
+            MYASSERT(ins.second, "Duplicated risk factor: " << name);
+        }
     } while (is);
 }
 

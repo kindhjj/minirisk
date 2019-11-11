@@ -27,6 +27,9 @@ struct ICurveDiscount;
 typedef std::shared_ptr<const ICurve> ptr_curve_t;
 typedef std::shared_ptr<const ICurveDiscount> ptr_disc_curve_t;
 
+struct ICurveFXSpot;
+
+typedef std::shared_ptr<const ICurveFXSpot> ptr_fxsp_t;
 struct ICurveDiscount : ICurve
 {
     virtual double df(const Date& m_dt, const unsigned& dt) const = 0;

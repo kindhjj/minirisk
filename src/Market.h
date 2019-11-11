@@ -16,6 +16,9 @@ private:
     template <typename I, typename T>
     std::shared_ptr<const I> get_curve(const string& name);
 
+    template <typename I, typename T>
+    std::shared_ptr<const I> get_fx(const string &name);
+
     double from_mds(const string& objtype, const string& name);
 
 public:
@@ -41,6 +44,8 @@ public:
 
     // fx exchange rate to convert 1 unit of ccy1 into USD
     const double get_fx_spot(const string& ccy);
+
+    const ptr_fxsp_t get_fx_ptr(const string& ccy);
 
     // after the market has been disconnected, it is no more possible to fetch
     // new data points from the market data server
