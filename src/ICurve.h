@@ -30,6 +30,11 @@ typedef std::shared_ptr<const ICurveDiscount> ptr_disc_curve_t;
 struct ICurveFXSpot;
 
 typedef std::shared_ptr<const ICurveFXSpot> ptr_fxsp_t;
+
+struct ICurveFXForward;
+
+typedef std::shared_ptr<const ICurveFXForward> ptr_fxfw_curve_t;
+
 struct ICurveDiscount : ICurve
 {
     virtual double df(const Date& m_dt, const unsigned& dt) const = 0;

@@ -11,6 +11,7 @@ namespace minirisk {
 extern const string ir_rate_prefix;
 extern const string ir_curve_discount_prefix;
 extern const string fx_spot_prefix;
+extern const string fx_forward_prefix;
 extern string base_ccy;
 
 inline string ir_curve_discount_name(const string& ccy)

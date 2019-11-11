@@ -2,11 +2,12 @@
 #include <algorithm>
 
 #include "MarketDataServer.h"
+#include "FixingDataServer.h"
 #include "PortfolioUtils.h"
 
 using namespace::minirisk;
 
-void run(const string& portfolio_file, const string& risk_factors_file)
+void run(const string& portfolio_file, const string& risk_factors_file, const string& fixing)
 {
     // load the portfolio from file
     portfolio_t portfolio = load_portfolio(portfolio_file);
@@ -28,10 +29,15 @@ void run(const string& portfolio_file, const string& risk_factors_file)
     Date today(2017,8,5);
     Market mkt(mds, today);
 
+    // load fixing data
+    std::shared_ptr<const FixingDataServer> fds;
+    if (!fixing.empty())
+        fds.reset(new FixingDataServer(fixing));
+
     // Price all products. Market objects are automatically constructed on demand,
     // fetching data as needed from the market data server.
     {
-        auto prices = compute_prices(pricers, mkt);
+        auto prices = compute_prices(pricers, mkt, fds);
         print_price_vector("PV", prices);
     }
 
@@ -48,13 +54,13 @@ void run(const string& portfolio_file, const string& risk_factors_file)
     }
 
     {   // Compute PV01 (i.e. sensitivity with respect to interest rate dV/dr)
-        std::vector<std::pair<string, portfolio_values_t>> pv01_bucketed(compute_pv01_bucketed(pricers,mkt));  // PV01 per trade
+        std::vector<std::pair<string, portfolio_values_t>> pv01_bucketed(compute_pv01_bucketed(pricers,mkt,fds));  // PV01 per trade
 
         // display PV01 bucketed per currency
         for (const auto& g : pv01_bucketed)
             print_price_vector("PV01 bucketed " + g.first, g.second);
 
-        std::vector<std::pair<string, portfolio_values_t>> pv01_parallel(compute_pv01_parallel(pricers,mkt));
+        std::vector<std::pair<string, portfolio_values_t>> pv01_parallel(compute_pv01_parallel(pricers,mkt,fds));
 
         // display PV01 parallel per currency
         for (const auto& g : pv01_parallel)
@@ -74,7 +80,7 @@ void usage()
 int main(int argc, const char **argv)
 {
     // parse command line arguments
-    string portfolio, riskfactors;
+    string portfolio, riskfactors, fixing;
     if (argc % 2 == 0)
         usage();
     for (int i = 1; i < argc; i += 2) {
@@ -86,6 +92,8 @@ int main(int argc, const char **argv)
             riskfactors = value;
         else if (key == "-b")
             base_ccy = value;
+        else if (key == "-x")
+            fixing = value;
         else
             usage();
     }
@@ -93,7 +101,7 @@ int main(int argc, const char **argv)
         usage();
 
     try {
-        run(portfolio, riskfactors);
+        run(portfolio, riskfactors, fixing);
         return 0;  // report success to the caller
     }
     catch (const std::exception& e)

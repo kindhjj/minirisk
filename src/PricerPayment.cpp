@@ -13,7 +13,7 @@ PricerPayment::PricerPayment(const TradePayment& trd)
 {
 }
 
-std::pair<double, string> PricerPayment::price(Market& mkt) const
+std::pair<double, string> PricerPayment::price(Market& mkt, ptr_fds_t& fds) const
 {
     unsigned dt = time_frac(mkt.today(), m_dt);
     // this throws an exception if m_dt<today

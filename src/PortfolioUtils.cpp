@@ -20,14 +20,14 @@ std::vector<ppricer_t> get_pricers(const portfolio_t& portfolio)
     return pricers;
 }
 
-portfolio_values_t compute_prices(const std::vector<ppricer_t>& pricers, Market& mkt)
+portfolio_values_t compute_prices(const std::vector<ppricer_t>& pricers, Market& mkt, ptr_fds_t& fds)
 {
     portfolio_values_t prices;
     prices.reserve(pricers.size());
     for (unsigned i = 0; i < pricers.size(); i++)
     {
         try{
-            prices.emplace_back(pricers[i]->price(mkt));
+            prices.emplace_back(pricers[i]->price(mkt, fds));
         }
         catch (const std::exception &e){
             prices.emplace_back(std::make_pair(std::numeric_limits<double>::quiet_NaN(), e.what()));
@@ -53,7 +53,7 @@ portfolio_values_nan_t portfolio_total(const portfolio_values_t& values)
 }
 
 //compute bucketed pv01
-std::vector<std::pair<string, portfolio_values_t>> compute_pv01_bucketed(const std::vector<ppricer_t> &pricers, const Market &mkt)
+std::vector<std::pair<string, portfolio_values_t>> compute_pv01_bucketed(const std::vector<ppricer_t> &pricers, const Market &mkt, ptr_fds_t& fds)
 {
     std::vector<std::pair<string, portfolio_values_t>> pv01_bucketed; // PV01 per trade
 
@@ -78,12 +78,12 @@ std::vector<std::pair<string, portfolio_values_t>> compute_pv01_bucketed(const s
         // bump down and price
         bumped[0].second = d.second - bump_size;
         tmpmkt.set_risk_factors(bumped);
-        pv_dn = compute_prices(pricers, tmpmkt);
+        pv_dn = compute_prices(pricers, tmpmkt, fds);
 
         // bump up and price
         bumped[0].second = d.second + bump_size; // bump up
         tmpmkt.set_risk_factors(bumped);
-        pv_up = compute_prices(pricers, tmpmkt);
+        pv_up = compute_prices(pricers, tmpmkt, fds);
 
         // restore original market state for next iteration
         // (more efficient than creating a new copy of the market at every iteration)
@@ -105,7 +105,7 @@ std::vector<std::pair<string, portfolio_values_t>> compute_pv01_bucketed(const s
 }
 
 //compute parallel pv01
-std::vector<std::pair<string, portfolio_values_t>> compute_pv01_parallel(const std::vector<ppricer_t>& pricers, const Market& mkt)
+std::vector<std::pair<string, portfolio_values_t>> compute_pv01_parallel(const std::vector<ppricer_t>& pricers, const Market& mkt, ptr_fds_t& fds)
 {
     std::vector<std::pair<string, portfolio_values_t>> pv01_parallel;
     std::vector<std::pair<double, string>> pv_up, pv_dn;
@@ -124,13 +124,13 @@ std::vector<std::pair<string, portfolio_values_t>> compute_pv01_parallel(const s
         for (auto rf_ccy : risk_factor_ccy)
             bumped.emplace_back(std::make_pair(rf_ccy.first, rf_ccy.second - bump_size));
         tmpmkt.set_risk_factors(bumped);
-        pv_dn = compute_prices(pricers, tmpmkt);
+        pv_dn = compute_prices(pricers, tmpmkt, fds);
 
         //bump up and price
         for (auto &each_bump : bumped)
             each_bump.second += 2.0 * bump_size;
         tmpmkt.set_risk_factors(bumped);
-        pv_up = compute_prices(pricers, tmpmkt);
+        pv_up = compute_prices(pricers, tmpmkt, fds);
 
         // restore original market state for next iteration
         for (auto &each_bump : bumped)
