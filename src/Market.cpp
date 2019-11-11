@@ -20,10 +20,10 @@ std::shared_ptr<const I> Market::get_curve(const string& name)   //copy discount
 template <typename I, typename T>
 std::shared_ptr<const I> Market::get_fxsp(const string& name)   //read fx spot from mds to mkt
 {
-    ptr_fxsp_t &curve_ptr = m_fxsp[name];
-    if (!curve_ptr.get())
-        curve_ptr.reset(new T(this, m_today, name));
-    std::shared_ptr<const I> res = std::dynamic_pointer_cast<const I>(curve_ptr);
+    ptr_fxsp_t &fx_ptr = m_fxsp[name];
+    if (!fx_ptr.get())
+        fx_ptr.reset(new T(this, m_today, name));
+    std::shared_ptr<const I> res = std::dynamic_pointer_cast<const I>(fx_ptr);
     MYASSERT(res, "Cannot cast object with name " << name << " to type " << typeid(I).name());
     return res;
 }
@@ -43,7 +43,10 @@ double Market::from_mds(const string& objtype, const string& name)
     if (ins.second) { // just inserted, need to be populated
         MYASSERT(m_mds, "Cannot fetch " << objtype << " " << name << " because the market data server has been disconnnected");
         if (objtype=="yield curve")
+        {
             ins.first->second = m_mds->get(name);
+            return ins.first->second;
+        }
         else if (objtype=="fx spot")
         {
             if (base_ccy != "USD")
@@ -59,10 +62,21 @@ double Market::from_mds(const string& objtype, const string& name)
                     return ins.first->second / m_mds->get(fx_spot_prefix + base_ccy);
                 }
             }
+            else
+                return ins.first->second = m_mds->get(name);
         }
-        ins.first->second = m_mds->get(name);
     }
-    return ins.first->second;
+    else
+    {
+        if (objtype == "fx spot")
+        {
+            if (base_ccy != "USD")
+                return (name.substr(name.length()-3)=="USD" ? 1.0 : m_risk_factors.find(name)->second) / (m_risk_factors.find(fx_spot_prefix + base_ccy)->second);
+            else
+                return m_risk_factors.find(name)->second;
+        }
+    }
+    MYASSERT(0, "Unkown error getting rates.")
 }
 
 const std::map<unsigned, double> Market::get_yield(const string& ccyname)
@@ -95,6 +109,16 @@ void Market::set_risk_factors(const vec_risk_factor_t& risk_factors)
         i->second = d.second;
         reset_curve<ICurveDiscount, ICurve>(d);
     }
+}
+
+void Market::set_fx_risk_factors(const vec_risk_factor_t &risk_factors)
+{
+    for (const auto& d : risk_factors) {
+        auto i = m_risk_factors.find(d.first);
+        MYASSERT((i != m_risk_factors.end()), "Risk factor not found " << d.first);
+        i->second = d.second;
+    }
+    reset_spot();
 }
 
 Market::vec_risk_factor_t Market::get_risk_factors(const std::string& expr) const
@@ -154,4 +178,10 @@ void Market::reset_curve(const std::pair<string, double>& rf){
     ICurveDiscount *ic = const_cast<ICurveDiscount *>(ic_c);
     ic->set_rate(tenor, rf.second);
 }
+
+void Market::reset_spot()
+{
+    std::for_each(m_fxsp.begin(), m_fxsp.end(), [](auto& p) { p.second.reset();});
+}
+
 } // namespace minirisk

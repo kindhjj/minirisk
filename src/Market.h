@@ -68,6 +68,8 @@ public:
     // destroy all existing objects and modify a selected number of data points
     void set_risk_factors(const vec_risk_factor_t& risk_factors);
 
+    void set_fx_risk_factors(const vec_risk_factor_t &risk_factors);
+
     const unsigned transferdate(const string &tenor_sub);
 
     const bool find_ccy_rate(const string& ccy) const;
@@ -75,6 +77,8 @@ public:
     //reset curve according to risk factors
     template <typename I, typename T>
     void reset_curve(const std::pair<string, double>& rf);
+
+    void reset_spot();
 
 private:
     Date m_today;
