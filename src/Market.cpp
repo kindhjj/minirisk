@@ -1,6 +1,7 @@
 #include "Market.h"
 #include "CurveDiscount.h"
 #include "CurveFXSpot.h"
+#include "CurveFXForward.h"
 
 #include <vector>
 
@@ -25,6 +26,18 @@ std::shared_ptr<const I> Market::get_fxsp(const string& name)   //read fx spot f
         fx_ptr.reset(new T(this, m_today, name));
     std::shared_ptr<const I> res = std::dynamic_pointer_cast<const I>(fx_ptr);
     MYASSERT(res, "Cannot cast object with name " << name << " to type " << typeid(I).name());
+    return res;
+}
+
+template <typename I, typename T>
+std::shared_ptr<const I> Market::get_fxforward(const string &ccy1, const string &ccy2)
+{
+    string fx_pair = fx_forward_name(ccy1, ccy2);
+    ptr_fxfw_curve_t &fxf_ptr = m_fxforward[fx_pair];
+    if (!fxf_ptr.get())
+        fxf_ptr.reset(new T(this, m_today, ccy1 + "." + ccy2));
+    std::shared_ptr<const I> res = std::dynamic_pointer_cast<const I>(fxf_ptr);
+    MYASSERT(res, "Cannot cast object with name " << fx_pair << " to type " << typeid(I).name());
     return res;
 }
 
@@ -98,6 +111,11 @@ const double Market::get_fx_spot(const string& name)
 const ptr_fxsp_t Market::get_fx_ptr(const string& ccy)
 {
     return get_fxsp<ICurveFXSpot, CurveFXSpot>(mds_spot_name(ccy));
+}
+
+const ptr_fxfw_curve_t Market::get_fxforward_ptr(const string &ccy1, const string &ccy2)
+{
+    return get_fxforward<ICurveFXForward, CurveFXForward>(ccy1, ccy2);
 }
 
 void Market::set_risk_factors(const vec_risk_factor_t& risk_factors)
@@ -182,6 +200,7 @@ void Market::reset_curve(const std::pair<string, double>& rf){
 void Market::reset_spot()
 {
     std::for_each(m_fxsp.begin(), m_fxsp.end(), [](auto& p) { p.second.reset();});
+    std::for_each(m_fxforward.begin(), m_fxforward.end(), [](auto& p) { p.second.reset();});
 }
 
 } // namespace minirisk

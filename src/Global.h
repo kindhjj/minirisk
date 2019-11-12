@@ -13,6 +13,7 @@ extern const string ir_curve_discount_prefix;
 extern const string fx_spot_prefix;
 extern const string fx_forward_prefix;
 extern string base_ccy;
+extern unsigned count_port;
 
 inline string ir_curve_discount_name(const string& ccy)
 {
@@ -23,6 +24,13 @@ inline string fx_spot_name(const string& ccy1, const string& ccy2)
 {
     return fx_spot_prefix + ccy1 + "." + ccy2;
 }
+
+inline string fx_forward_name(const string& ccy1, const string& ccy2)
+{
+    return fx_forward_prefix + ccy1 + "." + ccy2;
+}
+
+unsigned get_counting();
 
 string format_label(const string& s);
 

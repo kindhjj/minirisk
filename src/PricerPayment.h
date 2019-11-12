@@ -15,8 +15,6 @@ struct PricerPayment : IPricer
 
     virtual std::pair<double, string> price(Market &mkt, ptr_fds_t &fds) const;
 
-    void get_interval(const Market &mkt, bound_t &lower_bound, bound_t &higher_bound, bool& tenor_ticker, const string &m_name, const unsigned &dt) const;
-
     string get_ir_curve() const { return m_ir_curve; }
 
 private:
@@ -24,6 +22,7 @@ private:
     Date   m_dt;
     string m_ir_curve;
     string m_fx_ccy;
+    unsigned m_serial_id;
 };
 
 } // namespace minirisk

@@ -10,6 +10,7 @@ PricerPayment::PricerPayment(const TradePayment& trd)
     , m_dt(trd.delivery_date())
     , m_ir_curve(ir_curve_discount_name(trd.ccy()))
     , m_fx_ccy(trd.ccy() == base_ccy ? "" : fx_spot_name(trd.ccy(), base_ccy))
+    , m_serial_id(get_counting())
 {
 }
 

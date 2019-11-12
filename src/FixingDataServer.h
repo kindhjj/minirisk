@@ -25,7 +25,7 @@ public:
 
 private:
     // for simplicity, assumes market data can only have type double
-    std::map<std::string, std::map<Date, double>> m_data;
+    std::map<std::string, std::map<unsigned, double>> m_data;
 };
 
 }   //minirisk

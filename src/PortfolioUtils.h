@@ -32,7 +32,7 @@ std::vector<std::pair<string, portfolio_values_t>> compute_pv01_bucketed(const s
 std::vector<std::pair<string, portfolio_values_t>> compute_pv01_parallel(const std::vector<ppricer_t> &pricers, const Market &mkt, ptr_fds_t& fds);
 
 // Compute fx delta risk (dV/dfx)
-std::vector<std::pair<string, portfolio_values_t>> compute_fx_delta(const std::vector<ppricer_t> &pricers, const Market &mkt);
+std::vector<std::pair<string, portfolio_values_t>> compute_fx_delta(const std::vector<ppricer_t> &pricers, const Market &mkt, ptr_fds_t& fds);
 
 // save portfolio to file
 void save_portfolio(const string& filename, const std::vector<ptrade_t>& portfolio);

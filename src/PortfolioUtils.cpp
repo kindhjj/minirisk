@@ -1,6 +1,7 @@
 #include "Global.h"
 #include "PortfolioUtils.h"
 #include "TradePayment.h"
+#include "TradeFXForward.h"
 
 #include <numeric>
 
@@ -112,7 +113,7 @@ std::vector<std::pair<string, portfolio_values_t>> compute_pv01_parallel(const s
     const double bump_size = 0.01 / 100;
     Market tmpmkt(mkt);
     std::set<string> ccy_set;
-    std::for_each(pricers.begin(), pricers.end(), [&ccy_set](ppricer_t pp) { ccy_set.insert(pp->get_ir_curve()); });
+    std::for_each(pricers.begin(), pricers.end(), [&ccy_set](ppricer_t pp) { if (!pp->get_ir_curve().empty()) ccy_set.insert(pp->get_ir_curve()); });
     pv01_parallel.reserve(ccy_set.size());
     for (auto cs : ccy_set){
         pv01_parallel.emplace_back(std::make_pair(ir_rate_prefix + cs.substr(cs.length() - 3), std::vector<std::pair<double, string>>(pricers.size())));
@@ -148,7 +149,7 @@ std::vector<std::pair<string, portfolio_values_t>> compute_pv01_parallel(const s
     return pv01_parallel;
 }
 
-std::vector<std::pair<string, portfolio_values_t>> compute_fx_delta(const std::vector<ppricer_t> &pricers, const Market &mkt)
+std::vector<std::pair<string, portfolio_values_t>> compute_fx_delta(const std::vector<ppricer_t> &pricers, const Market &mkt, ptr_fds_t& fds)
 {
     std::vector<std::pair<string, portfolio_values_t>> fx_delta;
 
@@ -169,12 +170,12 @@ std::vector<std::pair<string, portfolio_values_t>> compute_fx_delta(const std::v
         // bump down and price
         bumped[0].second = d.second - bump_size;
         tmpmkt.set_fx_risk_factors(bumped);
-        pv_dn = compute_prices(pricers, tmpmkt);
+        pv_dn = compute_prices(pricers, tmpmkt, fds);
 
         // bump up and price
         bumped[0].second = d.second + bump_size;
         tmpmkt.set_fx_risk_factors(bumped);
-        pv_up = compute_prices(pricers, tmpmkt);
+        pv_up = compute_prices(pricers, tmpmkt, fds);
 
         bumped[0].second = d.second;
         tmpmkt.set_fx_risk_factors(bumped);
@@ -204,6 +205,8 @@ ptrade_t load_trade(my_ifstream& is)
 
     if (id == TradePayment::m_id)
         p.reset(new TradePayment);
+    else if (id == TradeFXForward::m_id)
+        p.reset(new TradeFXForward);
     else
         THROW("Unknown trade type:" << id);
 

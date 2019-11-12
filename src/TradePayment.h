@@ -18,6 +18,7 @@ struct TradePayment : Trade<TradePayment>
         Trade::init(quantity);
         m_ccy = ccy;
         m_delivery_date = delivery_date;
+        m_serial = get_counting();
     }
 
     virtual ppricer_t pricer() const;
@@ -30,6 +31,11 @@ struct TradePayment : Trade<TradePayment>
     const Date& delivery_date() const
     {
         return m_delivery_date;
+    }
+
+    const unsigned serial() const
+    {
+        return m_serial;
     }
 
 private:
@@ -52,6 +58,7 @@ private:
 private:
     string m_ccy;
     Date m_delivery_date;
+    unsigned m_serial;
 };
 
 } // namespace minirisk

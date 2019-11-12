@@ -19,6 +19,8 @@ CurveDiscount::CurveDiscount(Market *mkt, const Date& today, const string& curve
 
 double CurveDiscount::df(const Date& m_dt, const unsigned& dt) const
 {
+    if (dt==0)
+        return 1.0;
     auto lw = m_rate.lower_bound(dt);
     MYASSERT(lw != m_rate.end(), "Curve " << ir_curve_discount_name(m_name.substr(3)) << ", DF not available beyond last tenor date " << Date(m_rate.rbegin()->first + m_today.get_serial()).to_string(true) << ", requested " << m_dt.to_string(true));
     auto up = lw--;

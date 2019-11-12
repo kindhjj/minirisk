@@ -19,6 +19,9 @@ private:
     template <typename I, typename T>
     std::shared_ptr<const I> get_fxsp(const string &name);
 
+    template <typename I, typename T>
+    std::shared_ptr<const I> get_fxforward(const string &ccy1, const string &ccy2);
+
     double from_mds(const string& objtype, const string& name);
 
 public:
@@ -46,6 +49,8 @@ public:
     const double get_fx_spot(const string& ccy);
 
     const ptr_fxsp_t get_fx_ptr(const string& ccy);
+
+    const ptr_fxfw_curve_t get_fxforward_ptr(const string &ccy1, const string &ccy2);
 
     // after the market has been disconnected, it is no more possible to fetch
     // new data points from the market data server
@@ -92,6 +97,9 @@ private:
 
     // raw risk factors
     std::map<string, double> m_risk_factors;
+
+    // FX forward
+    std::map<string, ptr_fxfw_curve_t> m_fxforward;
 };
 
 } // namespace minirisk
