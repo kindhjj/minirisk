@@ -58,7 +58,7 @@ unsigned Date::day_of_year() const
 void Date::calculate_ymd(){
     unsigned days_remain;
     auto find_year = std::adjacent_find(days_epoch.begin(), days_epoch.end(), [&](unsigned v1, unsigned v2) -> bool {return v1 <= m_serial && m_serial < v2; });
-    m_y += static_cast<unsigned short>(std::distance(days_epoch.begin(), find_year));
+    m_y += static_cast<unsigned>(std::distance(days_epoch.begin(), find_year));
     days_remain = m_serial - *find_year + 1;
     unsigned month = 1;
     for (auto i = days_in_month.cbegin(); days_remain > *i; i++)

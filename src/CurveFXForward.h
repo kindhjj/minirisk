@@ -27,7 +27,6 @@ private:
     ptr_disc_curve_t m_ir2;
     ptr_fxsp_t m_fxspot_ccy1;
     ptr_fxsp_t m_fxspot_ccy2;
-    ;
     std::map<unsigned, double> m_forward_rate;
 }; // struct CurveFXForward
 

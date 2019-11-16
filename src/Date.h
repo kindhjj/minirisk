@@ -98,7 +98,7 @@ public:
     }
 
 private:
-    unsigned short m_y;
+    unsigned m_y;
     unsigned char m_m;
     unsigned char m_d;
     bool m_is_leap;

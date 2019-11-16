@@ -27,6 +27,8 @@ std::pair<double, string> PricerFXForward::price(Market &mkt, ptr_fds_t &fds) co
     Date m_sdt = time_frac(mkt.today(), m_settle_date);
     ptr_disc_curve_t disc = mkt.get_discount_curve(m_ccy2);
     double df_n = 0.0;
+    // Historical Fixing
+    // T1 < T0
     if (m_fixing_date < mkt.today())
     {
         double fixing_rate = fds->get(m_fx_ccy, m_fixing_date);
@@ -35,6 +37,7 @@ std::pair<double, string> PricerFXForward::price(Market &mkt, ptr_fds_t &fds) co
             //get ccy2 fx spot rate
             df_n *= mkt.get_fx_ptr(fx_spot_name(m_ccy2, m_ccy1))->spot();
     }
+    // T1 = T0 Historical Fixing, if not available use spot rate
     else if (m_fixing_date == mkt.today())
     {
         std::pair<double, bool> fixing_rate_pair = fds->lookup(m_fx_ccy, m_fixing_date);
@@ -47,6 +50,7 @@ std::pair<double, string> PricerFXForward::price(Market &mkt, ptr_fds_t &fds) co
         else
             df_n = disc->df(m_sdt, m_sdt.get_serial()) * (ccy1_spot / ccy2_spot - m_strike) * ccy2_spot;
     }
+    // T1 > T0 Resolve price from forward curve
     else
     {
         ptr_fxfw_curve_t forward_ptr = mkt.get_fxforward_ptr(m_ccy1, m_ccy2);

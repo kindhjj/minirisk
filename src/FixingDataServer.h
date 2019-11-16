@@ -3,6 +3,7 @@
 #include <map>
 #include <regex>
 #include <vector>
+#include <memory>
 #include "Global.h"
 #include "Date.h"
 
